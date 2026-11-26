@@ -1,13 +1,13 @@
-# E-Commerce (Next.js + Supabase)
+# E-Commerce (Next.js + Postgres on Neon)
 
 Full-stack e-commerce app, reworked from [E-Commerce](https://github.com/MontherAlzamli/E-Commerce) so it deploys on Vercel with no separate server.
 
 - `client/` customer store. The REST API (`/api/v1/*`) runs inside this Next.js app as an API route, using the original Express routes and controllers (`client/server/`).
 - `dashboard/` admin panel. It proxies `/api/v1` to the store app (`API_ORIGIN`).
-- Database: Supabase Postgres through Prisma (`client/prisma/schema.prisma`).
+- Database: **Neon Postgres (not Supabase, despite the repo name)** through Prisma (`client/prisma/schema.prisma`). Any Postgres works, including Supabase: set `DATABASE_URL` and `DATABASE_URL_UNPOOLED`.
 - Stripe for payments, Cloudinary for image uploads (optional: product images can also be URLs).
 
-Stack: Next.js 14, TypeScript, Tailwind CSS, Prisma, PostgreSQL (Supabase), JWT auth, Stripe.
+Stack: Next.js 14, TypeScript, Tailwind CSS, Prisma, PostgreSQL (Neon), JWT auth, Stripe.
 
 ## Deploy on Vercel
 
