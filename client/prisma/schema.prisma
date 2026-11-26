@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model users {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  username    String?
+  password    String?
+  role        String?
+  permissions Json?
+  carts       cart[]
+  orders      Order[]   
+  createdAt   DateTime @default(now())
+}
+ 
+model products {
+  id                 Int       @id @default(autoincrement())
+  productName        String?
+  productPrice       Float?
+  productDescription String?
+  productCategory    String?
+  productUrlImgs      Json?
+  productColors      Json?
+  productSizes       Json?
+  stock              Int       @default(1)
+  orders             OrderItem[]
+  carts              cart[]
+  createdAt          DateTime  @default(now())
+}
+
+model cart {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  productId  Int
+  quantity  Int      @default(1)
+  color     String?
+  size      String?
+  users    users @relation(fields: [userId], references: [id])
+  products    products @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  @@unique([userId, productId])
+}
+
+model Order {
+  id        Int        @id @default(autoincrement())
+  items     OrderItem[]
+  amount    Int        
+  payment   Payment?   @relation(fields: [paymentId], references: [id])
+  paymentId Int?       @unique
+  userId    Int        
+  users     users      @relation(fields: [userId], references: [id])
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  products  products @relation(fields: [productId], references: [id])
+}
+
+model Payment {
+  id             Int       @id @default(autoincrement())
+  amount         Int
+  currency       String
+  status         String
+  paymentIntentId String
+  order          Order?
+  createdAt      DateTime  @default(now())
+}
