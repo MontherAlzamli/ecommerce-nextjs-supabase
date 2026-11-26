@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
-// Demo catalog so a fresh database is not empty. Images are placeholder photos.
+// Demo catalog so a fresh database is not empty. Images are labeled placeholders.
 const demoProducts = [
   { productName: 'Classic White Sneakers', productPrice: 79, productCategory: 'men', productColors: ['white', 'black'], productSizes: ['40', '41', '42', '43', '44'] },
   { productName: 'Denim Jacket', productPrice: 95, productCategory: 'men', productColors: ['blue'], productSizes: ['S', 'M', 'L', 'XL'] },
@@ -14,6 +14,9 @@ const demoProducts = [
   { productName: 'High-Waist Jeans', productPrice: 72, productCategory: 'women', productColors: ['blue', 'black'], productSizes: ['S', 'M', 'L'] },
   { productName: 'Knit Wool Sweater', productPrice: 64, productCategory: 'women', productColors: ['cream', 'green'], productSizes: ['S', 'M', 'L', 'XL'] },
 ];
+
+const placeholder = (name: string) =>
+  `https://placehold.co/600x700/f6e9e6/111111/png?text=${encodeURIComponent(name)}`;
 
 async function main() {
   // Admin account comes from env vars. Without them no admin is created.
@@ -40,13 +43,21 @@ async function main() {
     }
   }
 
+  // Replace the earlier random photos with labeled placeholders (demo rows only).
+  for (const p of demoProducts) {
+    await prisma.products.updateMany({
+      where: { productName: p.productName, productDescription: `${p.productName}. Demo product for the store.` },
+      data: { productUrlImgs: [placeholder(p.productName)] },
+    });
+  }
+
   if ((await prisma.products.count()) === 0) {
     for (const [i, p] of demoProducts.entries()) {
       await prisma.products.create({
         data: {
           ...p,
           productDescription: `${p.productName}. Demo product for the store.`,
-          productUrlImgs: [`https://picsum.photos/seed/shop${i + 1}/600/700`],
+          productUrlImgs: [placeholder(p.productName)],
           stock: 25,
         },
       });
